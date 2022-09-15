@@ -68,7 +68,6 @@ func (s *server) msg(c *client, args []string) {
 }
 
 func (s *server) broadcast(sender *client, msg string) {
-	log.Printf("Amount of members for broadcast is: %d", len(s.members))
 	for addr, m := range s.members {
 		if sender.conn.RemoteAddr() != addr {
 			m.msg(msg)
