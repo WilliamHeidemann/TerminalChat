@@ -1,10 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net"
-	"strings"
 )
 
 type server struct {
@@ -45,39 +43,4 @@ func (s *server) newClient(conn net.Conn) *client {
 	c.msg("Available commands are /nick /msg and /quit")
 
 	return c
-}
-
-func (s *server) nick(c *client, args []string) {
-	if len(args) < 2 {
-		c.msg("nick is required. usage: /nick NAME")
-		return
-	}
-
-	c.nick = args[1]
-	c.msg(fmt.Sprintf("Nickname changed to %s", c.nick))
-}
-
-func (s *server) msg(c *client, args []string) {
-	if len(args) < 2 {
-		c.msg("message is required, usage: /msg MSG")
-		return
-	}
-
-	msg := strings.Join(args[1:], " ")
-	s.broadcast(c, c.nick+": "+msg)
-}
-
-func (s *server) broadcast(sender *client, msg string) {
-	for addr, m := range s.members {
-		if sender.conn.RemoteAddr() != addr {
-			m.msg(msg)
-		}
-	}
-}
-
-func (s *server) quit(c *client) {
-	log.Printf("client has left the chat: %s", c.conn.RemoteAddr().String())
-
-	c.msg("sad to see you go =(")
-	c.conn.Close()
 }
