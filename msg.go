@@ -2,9 +2,9 @@ package main
 
 import "strings"
 
-func (s *server) msg(c *client, args []string) {
+func (s *server) sendMessage(c *client, args []string) {
 	if len(args) < 2 {
-		c.msg("message is required. usage: /msg MSG")
+		c.messageClient("message is required. usage: /messageClient MSG")
 		return
 	}
 
@@ -15,7 +15,7 @@ func (s *server) msg(c *client, args []string) {
 func (s *server) broadcast(sender *client, msg string) {
 	for addr, m := range s.members {
 		if sender.conn.RemoteAddr() != addr {
-			m.msg(msg)
+			m.messageClient(msg)
 		}
 	}
 }

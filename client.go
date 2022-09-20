@@ -8,9 +8,9 @@ import (
 )
 
 type client struct {
-	conn     net.Conn
-	nick     string
-	commands chan<- command
+	conn   net.Conn
+	nick   string
+	server *server
 }
 
 func (c *client) readInput() {
@@ -26,22 +26,11 @@ func (c *client) readInput() {
 
 		switch cmd {
 		case "/nick":
-			c.commands <- command{
-				id:     CMD_NICK,
-				client: c,
-				args:   args,
-			}
+			c.server.nick(c, args)
 		case "/msg":
-			c.commands <- command{
-				id:     CMD_MSG,
-				client: c,
-				args:   args,
-			}
+			c.server.sendMessage(c, args)
 		case "/quit":
-			c.commands <- command{
-				id:     CMD_QUIT,
-				client: c,
-			}
+			c.server.quit(c)
 		default:
 			c.err(fmt.Errorf("unknown command: %s", cmd))
 		}
@@ -52,6 +41,6 @@ func (c *client) err(err error) {
 	c.conn.Write([]byte("err: " + err.Error() + "\n"))
 }
 
-func (c *client) msg(msg string) {
+func (c *client) messageClient(msg string) {
 	c.conn.Write([]byte("> " + msg + "\n"))
 }
